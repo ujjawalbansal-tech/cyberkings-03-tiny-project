@@ -22,24 +22,27 @@ git clone https://github.com/<YourUsername>/Smart-Attendance.git
 cd Smart-Attendance
 
 python -m venv attendance_env
-# Windows PowerShell
+
+
+Windows PowerShell
+
 .\attendance_env\Scripts\Activate.ps1
 
 pip install opencv-python pandas
 
 
 # How to Run
-python capture_faces.py   # to capture faces (optional)
-python train_model.py     # to train model (optional)
-python recognize_faces.py # to detect faces and mark attendance
+    python capture_faces.py   # to capture faces (optional)
+    python train_model.py     # to train model (optional)
+    python recognize_faces.py # to detect faces and mark attendance
 
 Detected faces will be saved in dataset/ folder
 Attendance will be saved in Attendance.csv
 
 # Folder Structure
-Smart-Attendance/
-├── capture_faces.py      # Capture faces from camera
-├── train_model.py        # Train face model
-├── recognize_faces.py    # Detect faces and mark attendance
-├── dataset/              # Detected face images
-├── Attendance.csv        # Generated attendance file
+    Smart-Attendance/
+    ├── capture_faces.py      # Capture faces from camera
+    ├── train_model.py        # Train face model
+    ├── recognize_faces.py    # Detect faces and mark attendance
+    ├── dataset/              # Detected face images
+    ├── Attendance.csv        # Generated attendance file
