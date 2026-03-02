@@ -26,6 +26,7 @@ This project is a Smart Attendance System that detects faces from images. It hel
     cd Smart-Attendance
     python -m venv attendance_env
 Windows PowerShell
+
     .\attendance_env\Scripts\Activate.ps1
     pip install opencv-python pandas
 
