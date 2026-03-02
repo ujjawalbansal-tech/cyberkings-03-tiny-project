@@ -16,7 +16,9 @@ This project is a Smart Attendance System that detects faces from images. It hel
 
 # Technologies Used
   Python
+  
   OpenCV
+  
   Pandas
 
 # Installation:
@@ -34,6 +36,7 @@ Windows PowerShell
     python recognize_faces.py # to detect faces and mark attendance
 
   Detected faces will be saved in dataset/ folder
+  
   Attendance will be saved in Attendance.csv
 
 # Folder Structure
