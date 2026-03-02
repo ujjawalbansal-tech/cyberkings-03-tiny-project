@@ -6,29 +6,26 @@ This project is a Smart Attendance System that detects faces from images. It hel
 
 # Features:
  Detects faces in images using OpenCV
+ 
  Draws rectangles around detected faces
+ 
  Saves detected faces locally in dataset/ folder
+ 
  Generates an Attendance CSV file with detected faces
 
 
 # Technologies Used
-    Python
-    OpenCV
-    Pandas
+  Python
+  OpenCV
+  Pandas
 
 # Installation:
-git clone https://github.com/<YourUsername>/Smart-Attendance.git
-
-cd Smart-Attendance
-
-python -m venv attendance_env
-
-
+    git clone https://github.com/<YourUsername>/Smart-Attendance.git
+    cd Smart-Attendance
+    python -m venv attendance_env
 Windows PowerShell
-
-.\attendance_env\Scripts\Activate.ps1
-
-pip install opencv-python pandas
+    .\attendance_env\Scripts\Activate.ps1
+    pip install opencv-python pandas
 
 
 # How to Run
@@ -36,8 +33,8 @@ pip install opencv-python pandas
     python train_model.py     # to train model (optional)
     python recognize_faces.py # to detect faces and mark attendance
 
-Detected faces will be saved in dataset/ folder
-Attendance will be saved in Attendance.csv
+  Detected faces will be saved in dataset/ folder
+  Attendance will be saved in Attendance.csv
 
 # Folder Structure
     Smart-Attendance/
