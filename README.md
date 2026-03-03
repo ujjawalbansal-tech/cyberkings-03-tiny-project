@@ -15,11 +15,9 @@ This project is a Smart Attendance System that detects faces from images. It hel
 
 
 # Technologies Used
-  Python
-  
-  OpenCV
-  
-  Pandas
+  - Python
+  - OpenCV
+  --Pandas
 
 # Installation:
     git clone https://github.com/<YourUsername>/Smart-Attendance.git
