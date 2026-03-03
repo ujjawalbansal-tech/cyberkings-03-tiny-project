@@ -14,12 +14,12 @@ This project is a Smart Attendance System that detects faces from images. It hel
  - Generates an Attendance CSV file with detected faces
 
 
-# Technologies Used
+## Technologies Used
   - Python
   - OpenCV
   - Pandas
 
-# Installation:
+## Installation:
     git clone https://github.com/<YourUsername>/Smart-Attendance.git
     cd Smart-Attendance
     python -m venv attendance_env
@@ -29,7 +29,7 @@ This project is a Smart Attendance System that detects faces from images. It hel
     pip install opencv-python pandas
 
 
-# How to Run
+## How to Run
     python capture_faces.py   # to capture faces (optional)
     python train_model.py     # to train model (optional)
     python recognize_faces.py # to detect faces and mark attendance
@@ -38,7 +38,7 @@ This project is a Smart Attendance System that detects faces from images. It hel
   
  - Attendance will be saved in Attendance.csv
 
-# Folder Structure
+## Folder Structure
     Smart-Attendance/
     ├── capture_faces.py      # Capture faces from camera
     ├── train_model.py        # Train face model
