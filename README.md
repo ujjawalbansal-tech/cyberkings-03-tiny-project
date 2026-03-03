@@ -5,13 +5,13 @@ This project is a Smart Attendance System that detects faces from images. It hel
 ⚠️ Note: Currently, the system only detects faces in uploaded images individually. Face recognition (matching faces to registered students) is not implemented yet.
 
 # Features:
- Detects faces in images using OpenCV
+ - Detects faces in images using OpenCV
  
- Draws rectangles around detected faces
+ - Draws rectangles around detected faces
  
- Saves detected faces locally in dataset/ folder
+ - Saves detected faces locally in dataset/ folder
  
- Generates an Attendance CSV file with detected faces
+ - Generates an Attendance CSV file with detected faces
 
 
 # Technologies Used
