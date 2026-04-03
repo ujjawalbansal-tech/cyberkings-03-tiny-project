@@ -1,5 +1,5 @@
 # cyberkings-03-tiny-project
-# Smart-Attendance – Face Detection:
+# Zariya :A PLATFORM THAT PROVIDES SERVICES!:
 This project is a Smart Attendance System that detects faces from images. It helps mark students present automatically in a CSV file.
 
 ⚠️ Note: Currently, the system only detects faces in uploaded images individually. Face recognition (matching faces to registered students) is not implemented yet.
