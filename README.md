@@ -1,12 +1,12 @@
- # 🧾 On-Demand Workforce Platform
+ # 🧾 On-Demand Workforce Platform :ZARIYA
 
-## 📌 Project Title
+## Project Title
 
 **Development of a Web-Based Platform for Connecting Customers with Unorganized Skilled Workers**
 
 ---
 
-## 📖 Project Description
+## Project Description
 
 The **On-Demand Workforce Platform** is a web-based application designed to connect customers with skilled workers such as plumbers, electricians, carpenters, and painters who are not formally employed.
 
@@ -20,7 +20,7 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 
 ---
 
-## 🎯 Objectives
+## Objectives
 
 * Provide employment opportunities to unorganized workers
 * Help customers find trusted workers quickly
@@ -29,9 +29,9 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 
 ---
 
-## ⚙️ Features
+##  Features
 
-### 👤 User Authentication
+### User Authentication
 
 * Separate registration and login for:
 
@@ -40,7 +40,7 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 
 ---
 
-### 👷 Worker Features
+###  Worker Features
 
 * Create and manage profile:
 
@@ -54,9 +54,9 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 
 ---
 
-### 👨‍💼 Customer Features
+### Customer Features
 
-#### 🔍 Search Workers
+####  Search Workers
 
 * Search by:
 
@@ -65,7 +65,7 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 * View worker profiles
 * Send job requests
 
-#### 📝 Post Job
+####  Post Job
 
 * Add job details:
 
@@ -78,7 +78,7 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 
 ---
 
-### 🔄 Hiring Workflow
+###  Hiring Workflow
 
 1. User registers/logs in
 2. Worker creates profile
@@ -91,14 +91,14 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 
 ---
 
-### ⭐ Rating & Feedback
+###  Rating & Feedback
 
 * Customers can rate workers
 * Reviews improve trust and ranking
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 | Layer    | Technology Used       |
 | -------- | --------------------- |
@@ -108,7 +108,7 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 
 ---
 
-## 🗄️ Database Structure
+##  Database Structure
 
 ### Tables:
 
@@ -119,42 +119,35 @@ This creates a **two-way interaction system**, improving accessibility, trust, a
 * **Ratings** (id, job_id, rating, review)
 
 ---
+##  Installation & Setup
 
-## 🚀 Installation & Setup
 
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-```
-
-### 2️⃣ Create Virtual Environment
+### 1 Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-### 3️⃣ Activate Environment
+### 2 Activate Environment
 
 ```bash
 venv\Scripts\activate   # Windows
 source venv/bin/activate  # Mac/Linux
 ```
 
-### 4️⃣ Install Dependencies
+### 3 Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5️⃣ Run the Application
+###  Run the Application
 
 ```bash
 python app.py
 ```
 
-### 6️⃣ Open in Browser
+###  Open in Browser
 
 ```
 http://127.0.0.1:5000/
@@ -162,34 +155,26 @@ http://127.0.0.1:5000/
 
 ---
 
-## 📌 Future Enhancements
+##  Future Enhancements
 
-* 💬 Real-time chat system
-* 💳 Online payment integration
-* 📍 Location-based services (Google Maps API)
-* 🤖 AI-based job-worker matching
-
----
-
-## 📸 Screenshots
-
-*(Add your project screenshots here)*
+*  Real-time chat system
+* Online payment integration
+*  Location-based services (Google Maps API)
+* AI-based job-worker matching
 
 ---
 
-## 🤝 Contribution
+
+
+---
+
+##  Contribution
 
 Contributions are welcome! Feel free to fork this repository and submit pull requests.
 
 ---
 
-## 📄 License
 
-This project is open-source and available under the **MIT License**.
-
----
-
-## 👩‍💻 Author
 
 **Your Name**
 GitHub: https://github.com/your-username
