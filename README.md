@@ -176,8 +176,4 @@ Contributions are welcome! Feel free to fork this repository and submit pull req
 
 
 
-**Your Name**
-GitHub: https://github.com/your-username
-
----
 
