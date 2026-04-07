@@ -1,4 +1,4 @@
- # 🧾 On-Demand Workforce Platform :ZARIYA
+ #  On-Demand Workforce Platform :ZARIYA
 
 ## Project Title
 
