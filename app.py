@@ -318,8 +318,7 @@ def profile_settings():
                            reviews=reviews_received)
 
 
-# Review submit ke baad — already_reviewed check add karo
-# Purana submit_review route replace karo:
+
 @app.route('/review/<int:job_id>', methods=['POST'])
 @login_required
 def submit_review(job_id):
