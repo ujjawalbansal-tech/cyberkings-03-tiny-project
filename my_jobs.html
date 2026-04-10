@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}My Jobs — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">My Jobs</div>
+    <div class="page-sub">All your job posts and their current status</div>
+  </div>
+  <a href="{{ url_for('post_job') }}" class="btn btn-green">+ New Job</a>
+</div>
+
+{% if jobs %}
+  {% for job in jobs %}
+  <div class="job-item">
+    <div class="job-top">
+      <div class="job-title">{{ job.title }}</div>
+      <span class="sbadge s-{{ job.status }}">{{ job.status }}</span>
+    </div>
+    {% if job.description %}
+      <div class="job-desc">{{ job.description|truncate(120) }}</div>
+    {% endif %}
+    <div class="job-foot">
+      <span class="chip">{{ job.skill }}</span>
+      <span class="chip">{{ job.location }}</span>
+      {% if job.budget %}<span class="chip">{{ job.budget }}</span>{% endif %}
+      {% if job.date_needed %}<span class="chip">{{ job.date_needed }}</span>{% endif %}
+      <span style="font-size:12px;color:var(--text-muted);">
+        {{ job.applications|length }} application{{ 's' if job.applications|length != 1 }}
+      </span>
+
+      <div class="chip-ml" style="display:flex;gap:6px;">
+        {% if job.status == 'open' %}
+          <a href="{{ url_for('job_applications', job_id=job.id) }}" class="btn btn-sm btn-green">
+            View Applications
+          </a>
+        {% elif job.status == 'assigned' %}
+          <a href="{{ url_for('complete_job', job_id=job.id) }}" class="btn btn-sm btn-green">
+            Mark Complete
+          </a>
+        {% elif job.status == 'completed' and job.assigned_worker_id %}
+          <button onclick="toggleReview({{ job.id }})" class="btn btn-sm">Leave Review</button>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if job.status == 'assigned' and job.assigned_worker %}
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);">
+      Assigned to: <strong style="color:var(--text);">{{ job.assigned_worker.name }}</strong>
+      {% if job.assigned_worker.phone %}· {{ job.assigned_worker.phone }}{% endif %}
+    </div>
+    {% endif %}
+
+    {% if job.status == 'completed' and job.assigned_worker_id %}
+    <div id="review-{{ job.id }}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <form method="POST" action="{{ url_for('submit_review', job_id=job.id) }}">
+        <div style="display:flex;gap:10px;align-items:flex-end;">
+          <div class="field" style="margin:0;flex:0 0 120px;">
+            <label>Rating</label>
+            <select name="rating">
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+              <option value="2">★★☆☆☆ (2)</option>
+              <option value="1">★☆☆☆☆ (1)</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0;flex:1;">
+            <label>Comment</label>
+            <input type="text" name="comment" placeholder="How was the work?" />
+          </div>
+          <button type="submit" class="btn btn-green btn-sm" style="margin-bottom:1px;">Submit</button>
+        </div>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📋</div>
+    <div class="empty-title">No jobs yet</div>
+    <div class="empty-sub">Post your first job to start receiving applications</div>
+    <a href="{{ url_for('post_job') }}" class="btn btn-green" style="margin-top:14px;">Post a Job</a>
+  </div>
+{% endif %}
+
+{% endblock %}
