@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Find Workers — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">Find Workers</div>
+    <div class="page-sub">Search skilled workers available near you</div>
+  </div>
+</div>
+
+<form method="GET" class="search-bar">
+  <input type="text" name="skill" value="{{ skill }}" placeholder="Skill (plumber, electrician...)" />
+  <input type="text" name="location" value="{{ location }}" placeholder="City / Area" />
+  <button type="submit" class="btn btn-green">Search</button>
+  {% if skill or location %}
+    <a href="{{ url_for('find_workers') }}" class="btn">Clear</a>
+  {% endif %}
+</form>
+
+{% if workers %}
+  <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+    {{ workers|length }} worker{{ 's' if workers|length != 1 }} found
+  </div>
+  <div class="cards-grid">
+    {% for worker in workers %}
+    <div class="wcard">
+      <div class="wcard-head">
+        <div class="wcard-av" style="background:var(--green-lite);color:var(--green-dark);">
+          {{ worker.get_initials() }}
+        </div>
+        <div>
+          <div class="wcard-name">{{ worker.name }}</div>
+          <div class="wcard-loc">{{ worker.city or 'Location not set' }}</div>
+        </div>
+      </div>
+      <div class="wcard-tags">
+        {% if worker.skill %}
+          <span class="tag tag-green">{{ worker.skill }}</span>
+        {% endif %}
+      </div>
+      <div class="wcard-meta">
+        <span>
+          <span class="avail-dot {% if not worker.is_available %}avail-off{% endif %}"></span>
+          {{ 'Available' if worker.is_available else 'Unavailable' }}
+        </span>
+        {% if worker.experience %}
+          <span class="exp-chip">{{ worker.experience }} yrs exp</span>
+        {% endif %}
+        {% if worker.avg_rating > 0 %}
+          <span><span class="stars">★</span> {{ "%.1f"|format(worker.avg_rating) }}</span>
+        {% else %}
+          <span style="color:var(--text-hint);font-size:12px;">No reviews yet</span>
+        {% endif %}
+      </div>
+
+      <form method="POST" action="{{ url_for('send_direct_request', worker_id=worker.id) }}" style="margin-top:10px;">
+        <input type="hidden" name="title" value="Direct request from {{ current_user.name }}" />
+        <input type="hidden" name="skill" value="{{ worker.skill }}" />
+        <div class="field" style="margin-bottom:8px;">
+          <textarea name="description" placeholder="Describe your work briefly..." rows="2"
+            style="width:100%;padding:7px 10px;font-size:13px;border:1px solid var(--border-md);border-radius:var(--radius-sm);font-family:inherit;resize:none;"></textarea>
+        </div>
+        <button type="submit" class="btn btn-green btn-sm" style="width:100%;">Send Request</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <div class="empty-title">No workers found</div>
+    <div class="empty-sub">Try a different skill or location, or post a job instead</div>
+    <a href="{{ url_for('post_job') }}" class="btn btn-green" style="margin-top:14px;">Post a Job</a>
+  </div>
+{% endif %}
+
+{% endblock %}
