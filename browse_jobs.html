@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Browse Jobs — KaamConnect{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">Browse Jobs</div>
+    <div class="page-sub">Open jobs matching your skills near you</div>
+  </div>
+</div>
+
+<form method="GET" class="search-bar">
+  <input type="text" name="skill" value="{{ skill }}" placeholder="Skill (plumber, carpenter...)" />
+  <input type="text" name="location" value="{{ location }}" placeholder="City / Area" />
+  <button type="submit" class="btn btn-green">Filter</button>
+  {% if skill or location %}
+    <a href="{{ url_for('browse_jobs') }}" class="btn">Clear</a>
+  {% endif %}
+</form>
+
+{% if jobs %}
+  <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+    {{ jobs|length }} job{{ 's' if jobs|length != 1 }} available
+  </div>
+
+  {% for job in jobs %}
+  <div class="job-item">
+    <div class="job-top">
+      <div class="job-title">{{ job.title }}</div>
+      <span class="sbadge s-open">open</span>
+    </div>
+    {% if job.description %}
+      <div class="job-desc">{{ job.description|truncate(120) }}</div>
+    {% endif %}
+    <div class="job-foot">
+      <span class="chip">{{ job.skill }}</span>
+      <span class="chip">{{ job.location }}</span>
+      {% if job.budget %}<span class="chip">{{ job.budget }}</span>{% endif %}
+      {% if job.date_needed %}<span class="chip">{{ job.date_needed }}</span>{% endif %}
+      <span class="chip">Posted {{ job.created_at.strftime('%d %b') }}</span>
+
+      <div class="chip-ml">
+        {% if job.id in applied_ids %}
+          <span class="sbadge s-pending">Applied</span>
+        {% else %}
+          <button onclick="toggleApply({{ job.id }})" class="btn btn-sm btn-green">Apply</button>
+        {% endif %}
+      </div>
+    </div>
+
+    <div id="apply-form-{{ job.id }}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <form method="POST" action="{{ url_for('apply_job', job_id=job.id) }}">
+        <div style="display:flex;gap:8px;align-items:flex-end;">
+          <div class="field" style="margin:0;flex:1;">
+            <label>Message to customer (optional)</label>
+            <input type="text" name="message" placeholder="e.g. I have 5 years experience in this, available today" />
+          </div>
+          <button type="submit" class="btn btn-green btn-sm" style="margin-bottom:1px;">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <div class="empty-title">No jobs found</div>
+    <div class="empty-sub">Try different filters or check back later</div>
+  </div>
+{% endif %}
+
+{% endblock %}
