@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}All Requests — Zariya{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">All Requests</div>
+    <div class="page-sub">Every application received across all your job posts</div>
+  </div>
+</div>
+
+{% set has_any = false %}
+{% for job in jobs %}
+  {% if job.applications %}
+    {% set has_any = true %}
+
+    <div class="requests-job-block">
+      <div class="rjb-header">
+        <div>
+          <div class="rjb-title">{{ job.title }}</div>
+          <div class="rjb-meta">
+            <span class="chip">{{ job.skill }}</span>
+            <span class="chip">{{ job.location }}</span>
+            {% if job.budget %}<span class="chip">{{ job.budget }}</span>{% endif %}
+          </div>
+        </div>
+        <span class="sbadge s-{{ job.status }}">{{ job.status }}</span>
+      </div>
+
+      <div class="requests-list">
+        {% for app in job.applications %}
+        <div class="request-card {% if app.status == 'accepted' %}req-accepted{% elif app.status == 'rejected' %}req-rejected{% endif %}">
+          <div class="rc-left">
+            <div class="rc-av">{{ app.worker.get_initials() }}</div>
+            <div class="rc-info">
+              <div class="rc-name">{{ app.worker.name }}</div>
+              <div class="rc-meta">
+                {% if app.worker.city %}{{ app.worker.city }}{% endif %}
+                {% if app.worker.skill %} · {{ app.worker.skill }}{% endif %}
+                {% if app.worker.experience %} · {{ app.worker.experience }} yrs exp{% endif %}
+              </div>
+              {% if app.worker.avg_rating > 0 %}
+                <div class="rc-rating">
+                  <span class="stars">{% for i in range(app.worker.avg_rating|int) %}★{% endfor %}</span>
+                  {{ "%.1f"|format(app.worker.avg_rating) }}
+                  ({{ app.worker.total_reviews }} reviews)
+                </div>
+              {% endif %}
+              {% if app.message %}
+                <div class="rc-message">"{{ app.message }}"</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="rc-right">
+            <span class="sbadge s-{{ app.status }}">{{ app.status }}</span>
+            <div class="rc-time">{{ app.created_at.strftime('%d %b, %H:%M') }}</div>
+            {% if app.status == 'pending' and job.status == 'open' %}
+              <a href="{{ url_for('accept_application', app_id=app.id) }}"
+                 class="btn btn-green btn-sm"
+                 onclick="return confirm('Hire {{ app.worker.name }}?')">
+                Hire
+              </a>
+            {% elif app.status == 'accepted' %}
+              {% if app.worker.phone %}
+                <div class="rc-contact">📞 {{ app.worker.phone }}</div>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endfor %}
+
+{% if not has_any %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <div class="empty-title">No requests yet</div>
+    <div class="empty-sub">Post a job to start receiving applications from workers</div>
+    <a href="{{ url_for('post_job') }}" class="btn btn-green" style="margin-top:16px;">Post a Job</a>
+  </div>
+{% endif %}
+
+{% endblock %}

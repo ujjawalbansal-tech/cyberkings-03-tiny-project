@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}My Applications — KaamConnect{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">My Applications</div>
+    <div class="page-sub">Track all jobs you've applied for</div>
+  </div>
+</div>
+
+{% if applications %}
+  {% for app in applications %}
+  <div class="job-item">
+    <div class="job-top">
+      <div class="job-title">{{ app.job.title }}</div>
+      <span class="sbadge s-{{ app.status }}">{{ app.status }}</span>
+    </div>
+
+    <div class="job-foot" style="margin-top:6px;">
+      <span class="chip">{{ app.job.skill }}</span>
+      <span class="chip">{{ app.job.location }}</span>
+      {% if app.job.budget %}<span class="chip">{{ app.job.budget }}</span>{% endif %}
+      <span class="chip">Applied {{ app.created_at.strftime('%d %b %Y') }}</span>
+
+      {% if app.status == 'accepted' %}
+        <div class="chip-ml" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:var(--green-dark);font-weight:500;">
+            ✓ Hired by {{ app.job.customer.name }}
+          </span>
+          {% if app.job.customer.phone %}
+            <span class="chip">📞 {{ app.job.customer.phone }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if app.message %}
+      <div style="font-size:13px;color:var(--text-muted);margin-top:8px;font-style:italic;">
+        Your message: "{{ app.message }}"
+      </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <div class="empty-title">No applications yet</div>
+    <div class="empty-sub">Browse open jobs and apply to get started</div>
+    <a href="{{ url_for('browse_jobs') }}" class="btn btn-green" style="margin-top:14px;">Browse Jobs</a>
+  </div>
+{% endif %}
+
+{% endblock %}

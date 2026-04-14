@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — KaamConnect{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">My Profile</div>
+    <div class="page-sub">Update your details and availability</div>
+  </div>
+</div>
+
+<div class="profile-grid">
+  <div>
+    <div class="profile-card">
+      <div class="profile-av-lg">{{ current_user.get_initials() }}</div>
+      <div class="profile-name">{{ current_user.name }}</div>
+      <div class="profile-role">
+        {{ current_user.skill or 'Skill not set' }}
+        {% if current_user.city %} · {{ current_user.city }}{% endif %}
+      </div>
+      {% if current_user.avg_rating > 0 %}
+        <div style="margin-bottom:10px;">
+          <span class="stars">★★★★★</span>
+          <span style="font-size:13px;color:var(--text-muted);">
+            {{ "%.1f"|format(current_user.avg_rating) }} ({{ current_user.total_reviews }} reviews)
+          </span>
+        </div>
+      {% endif %}
+      <span class="sbadge {{ 's-accepted' if current_user.is_available else 's-rejected' }}">
+        {{ 'Available' if current_user.is_available else 'Unavailable' }}
+      </span>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
+        {{ completed }} jobs completed
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="info-card">
+      <div class="info-title">Edit Profile</div>
+      <form method="POST">
+        <div class="field-grid">
+          <div class="field">
+            <label>Full name</label>
+            <input type="text" name="name" value="{{ current_user.name }}" required />
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input type="tel" name="phone" value="{{ current_user.phone or '' }}" placeholder="+91 XXXXX XXXXX" />
+          </div>
+          <div class="field">
+            <label>City / Area</label>
+            <input type="text" name="city" value="{{ current_user.city or '' }}" placeholder="Mathura, Agra..." />
+          </div>
+          <div class="field">
+            <label>Experience (years)</label>
+            <input type="number" name="experience" value="{{ current_user.experience or 0 }}" min="0" />
+          </div>
+          <div class="field">
+            <label>Primary skill</label>
+            <select name="skill">
+              {% for s in ['Plumber','Electrician','Carpenter','Painter','Mason','Welder','Cleaner','Driver','Other'] %}
+                <option value="{{ s }}" {{ 'selected' if current_user.skill == s }}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label>Availability</label>
+            <select name="is_available">
+              <option value="on" {{ 'selected' if current_user.is_available }}>Available</option>
+              <option value="" {{ 'selected' if not current_user.is_available }}>Unavailable</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-full-green" style="margin-top:6px;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

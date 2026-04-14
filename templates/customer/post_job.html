@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Post a Job — KaamConnect{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">Post a Job</div>
+    <div class="page-sub">Describe your work — skilled workers will apply</div>
+  </div>
+</div>
+
+<div class="form-card">
+  <form method="POST">
+    <div class="field">
+      <label>Job Title *</label>
+      <input type="text" name="title" placeholder="e.g. Fix bathroom pipe leak" required />
+    </div>
+
+    <div class="field">
+      <label>Description</label>
+      <textarea name="description" rows="4" placeholder="Describe the work in detail — what needs to be done, any special requirements..."></textarea>
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label>Skill Required *</label>
+        <select name="skill" required>
+          <option value="">Select a skill</option>
+          <option>Plumber</option>
+          <option>Electrician</option>
+          <option>Carpenter</option>
+          <option>Painter</option>
+          <option>Mason</option>
+          <option>Welder</option>
+          <option>Cleaner</option>
+          <option>Driver</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Location *</label>
+        <input type="text" name="location" value="{{ current_user.city or '' }}" placeholder="Area / City" required />
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label>Budget (optional)</label>
+        <input type="text" name="budget" placeholder="e.g. ₹500 – ₹1000" />
+      </div>
+      <div class="field">
+        <label>Preferred Date</label>
+        <input type="date" name="date_needed" />
+      </div>
+    </div>
+
+    <button type="submit" class="btn-full-green">Post Job</button>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Zariya{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% if current_user.is_authenticated %}
+<nav class="topbar">
+  <div class="topbar-left">
+    <div class="logo">
+      <span class="logo-dot"></span>
+      Zariya
+    </div>
+    <div class="nav-links">
+      {% if current_user.role == 'customer' %}
+        <a href="{{ url_for('dashboard') }}"      class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{{ url_for('find_workers') }}"   class="nav-link {% if request.endpoint=='find_workers' %}active{% endif %}">Find Workers</a>
+        <a href="{{ url_for('post_job') }}"       class="nav-link {% if request.endpoint=='post_job' %}active{% endif %}">Post a Job</a>
+        <a href="{{ url_for('my_jobs') }}"        class="nav-link {% if request.endpoint=='my_jobs' %}active{% endif %}">My Jobs</a>
+        <a href="{{ url_for('all_requests') }}"   class="nav-link {% if request.endpoint=='all_requests' %}active{% endif %}">
+          All Requests
+          {% set total_pending = namespace(count=0) %}
+          {% for job in current_user.jobs_posted %}
+            {% for app in job.applications %}
+              {% if app.status == 'pending' %}{% set total_pending.count = total_pending.count + 1 %}{% endif %}
+            {% endfor %}
+          {% endfor %}
+          {% if total_pending.count > 0 %}
+            <span class="nav-badge">{{ total_pending.count }}</span>
+          {% endif %}
+        </a>
+      {% else %}
+        <a href="{{ url_for('dashboard') }}"        class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{{ url_for('browse_jobs') }}"      class="nav-link {% if request.endpoint=='browse_jobs' %}active{% endif %}">Browse Jobs</a>
+        <a href="{{ url_for('my_applications') }}"  class="nav-link {% if request.endpoint=='my_applications' %}active{% endif %}">My Applications</a>
+        <a href="{{ url_for('all_requests') }}"     class="nav-link {% if request.endpoint=='all_requests' %}active{% endif %}">
+          Requests
+          {% set pending = current_user.applications | selectattr('status','equalto','pending') | list | length %}
+          {% if pending > 0 %}<span class="nav-badge">{{ pending }}</span>{% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <!-- User pill with dropdown -->
+    <div class="user-menu-wrap">
+      <div class="user-pill" onclick="toggleUserMenu()" id="userPill">
+        <div class="user-av">{{ current_user.get_initials() }}</div>
+        <span class="user-name">{{ current_user.name.split()[0] }}</span>
+        <span class="role-tag {{ current_user.role }}">{{ current_user.role }}</span>
+        <span class="pill-arrow" id="pillArrow">▾</span>
+      </div>
+
+      <div class="user-dropdown" id="userDropdown">
+        <div class="dropdown-header">
+          <div class="dh-av">{{ current_user.get_initials() }}</div>
+          <div>
+            <div class="dh-name">{{ current_user.name }}</div>
+            <div class="dh-email">{{ current_user.email }}</div>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('profile_settings') }}" class="dropdown-item">
+          <span class="di-icon">👤</span> My Profile
+        </a>
+        <a href="{{ url_for('profile_settings') }}#settings" class="dropdown-item">
+          <span class="di-icon">⚙️</span> Settings
+        </a>
+        <a href="{{ url_for('all_requests') }}" class="dropdown-item">
+          <span class="di-icon">📋</span> All Requests
+        </a>
+        {% if current_user.role == 'worker' %}
+        <a href="{{ url_for('worker_profile') }}" class="dropdown-item">
+          <span class="di-icon">🔧</span> Edit Worker Profile
+        </a>
+        {% endif %}
+        <div class="dropdown-divider"></div>
+        <a href="{{ url_for('logout') }}" class="dropdown-item danger">
+          <span class="di-icon">🚪</span> Logout
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
