@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
@@ -146,7 +145,7 @@ def job_applications(job_id):
 
 
 @app.route('/accept-application/<int:app_id>')
-@login_required
+@login_required  
 def accept_application(app_id):
     application = Application.query.get_or_404(app_id)
     job = application.job
@@ -259,95 +258,29 @@ def worker_profile():
     return render_template('worker/profile.html', completed=completed)
 
 
-# ─── Init DB ─────────────────────────────────────────────────
-with app.app_context():
-    db.create_all()
-
-
-# app.py mein existing routes ke baad add karo
-
-@app.route('/requests')
-@login_required
-def all_requests():
-    if current_user.role == 'customer':
-        # Customer ke saare jobs ki applications
-        jobs = Job.query.filter_by(customer_id=current_user.id).all()
-        return render_template('customer/all_requests.html', jobs=jobs)
-    else:
-        # Worker ke saare incoming direct requests + applied jobs
-        applications = Application.query.filter_by(
-            worker_id=current_user.id
-        ).order_by(Application.created_at.desc()).all()
-        return render_template('worker/all_requests.html', applications=applications)
-
-
-@app.route('/profile-settings', methods=['GET', 'POST'])
-@login_required
-def profile_settings():
-    if request.method == 'POST':
-        current_user.name  = request.form.get('name', current_user.name)
-        current_user.phone = request.form.get('phone', current_user.phone)
-        current_user.city  = request.form.get('city', current_user.city)
-        if current_user.role == 'worker':
-            current_user.skill      = request.form.get('skill', current_user.skill)
-            current_user.experience = int(request.form.get('experience') or current_user.experience or 0)
-            current_user.is_available = 'is_available' in request.form
-        new_pw  = request.form.get('new_password', '').strip()
-        curr_pw = request.form.get('current_password', '').strip()
-        if new_pw:
-            if not current_user.check_password(curr_pw):
-                flash('Current password is incorrect.', 'error')
-                return redirect(url_for('profile_settings'))
-            current_user.set_password(new_pw)
-            flash('Password updated successfully.', 'success')
-        db.session.commit()
-        flash('Profile updated!', 'success')
-        return redirect(url_for('profile_settings'))
-    completed = 0
-    if current_user.role == 'worker':
-        completed = Application.query.filter_by(
-            worker_id=current_user.id, status='accepted'
-        ).count()
-    reviews_received = []
-    if current_user.role == 'worker':
-        reviews_received = Review.query.filter_by(
-            worker_id=current_user.id
-        ).order_by(Review.created_at.desc()).all()
-    return render_template('profile_settings.html',
-                           completed=completed,
-                           reviews=reviews_received)
-
-
-
+# ─── Review Route ────────────────────────────────────────────
 @app.route('/review/<int:job_id>', methods=['POST'])
 @login_required
 def submit_review(job_id):
-    job = Job.query.get_or_404(job_id)
-    # Already reviewed check
-    existing = Review.query.filter_by(
-        job_id=job_id, reviewer_id=current_user.id
-    ).first()
-    if existing:
-        flash('You have already reviewed this job.', 'info')
-        return redirect(url_for('my_jobs'))
-    rating  = int(request.form.get('rating', 5))
-    comment = request.form.get('comment', '')
-    review  = Review(
-        job_id=job_id,
-        worker_id=job.assigned_worker_id,
-        reviewer_id=current_user.id,
-        rating=rating,
-        comment=comment
-    )
+    job    = Job.query.get_or_404(job_id)
+    rating = int(request.form.get('rating', 5))
+    comment= request.form.get('comment', '')
+    review = Review(job_id=job_id, worker_id=job.assigned_worker_id,
+                    reviewer_id=current_user.id, rating=rating, comment=comment)
     db.session.add(review)
     worker = User.query.get(job.assigned_worker_id)
     if worker:
         total = worker.total_reviews + 1
-        worker.avg_rating    = ((worker.avg_rating * worker.total_reviews) + rating) / total
+        worker.avg_rating   = ((worker.avg_rating * worker.total_reviews) + rating) / total
         worker.total_reviews = total
     db.session.commit()
-    flash('Review submitted! Thank you.', 'success')
+    flash('Review submitted!', 'success')
     return redirect(url_for('my_jobs'))
+
+
+# ─── Init DB ─────────────────────────────────────────────────
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
