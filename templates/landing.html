@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}ZARIYA — Find Work, Find Workers{% endblock %}
+{% block content %}
+<div class="landing">
+  <div class="landing-hero">
+    <div class="hero-badge">One platform · every place</div>
+    <h1>Find Trusted Workers<br>Near You.</h1>
+    <h2 style="color: green;",>ZARIYA</h2>
+    <p class="hero-sub" style="text-align: left;">India's platform connecting customers with trusted skilled workers — plumbers, electricians, carpenters and more.</p>
+    <br>
+    <div class="hero-btns">
+      <a href="{{ url_for('signup') }}" class="btn-primary-lg">Get started free</a>
+      <a href="{{ url_for('login') }}"  class="btn-outline-lg">Login</a>
+    </div>
+  </div>
+  <div class="landing-cards">
+    <div class="lcard">
+      <div class="lcard-icon">🔧</div>
+      <div class="lcard-title">For Workers</div>
+      <div class="lcard-desc">Create your profile, browse local job posts, apply and get hired. Free to join.</div>
+    </div>
+    <div class="lcard">
+      <div class="lcard-icon">🔍</div>
+      <div class="lcard-title">For Customers</div>
+      <div class="lcard-desc">Search verified workers or post a job — let workers come to you.</div>
+    </div>
+    <div class="lcard">
+      <div class="lcard-icon">⭐</div>
+      <div class="lcard-title">Ratings & Trust</div>
+      <div class="lcard-desc">Every worker rated by real customers. Hire with confidence.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

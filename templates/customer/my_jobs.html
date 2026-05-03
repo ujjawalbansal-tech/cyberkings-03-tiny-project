@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}My Jobs — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">My Jobs</div>
+    <div class="page-sub">All your job posts and their current status</div>
+  </div>
+  <a href="{{ url_for('post_job') }}" class="btn btn-green">+ New Job</a>
+</div>
+
+{% if jobs %}
+  {% for job in jobs %}
+  <div class="job-item">
+    <div class="job-top">
+      <div class="job-title">{{ job.title }}</div>
+      <span class="sbadge s-{{ job.status }}">{{ job.status }}</span>
+    </div>
+
+    {% if job.description %}
+      <div class="job-desc">{{ job.description|truncate(120) }}</div>
+    {% endif %}
+
+    <div class="job-foot">
+      <span class="chip">{{ job.skill }}</span>
+      <span class="chip">{{ job.location }}</span>
+      {% if job.budget %}<span class="chip">₹{{ job.budget }}/day</span>{% endif %}
+      {% if job.date_from %}
+        <span class="chip">📅 {{ job.date_from }}{% if job.date_to %} → {{ job.date_to }}{% endif %}</span>
+      {% endif %}
+      <span style="font-size:12px;color:var(--text-muted);">
+        {{ job.applications|length }} application{{ 's' if job.applications|length != 1 }}
+      </span>
+
+      <div class="chip-ml" style="display:flex;gap:6px;align-items:center;">
+        {% if job.status == 'open' %}
+          <a href="{{ url_for('job_applications', job_id=job.id) }}" class="btn btn-sm btn-green">View Applications</a>
+          <form method="POST" action="{{ url_for('remove_job', job_id=job.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-red"
+                    onclick="return confirm('Remove this job?')">Remove</button>
+          </form>
+
+        {% elif job.status == 'assigned' %}
+          <a href="{{ url_for('complete_job', job_id=job.id) }}" class="btn btn-sm btn-green">Mark Complete</a>
+          {% set days_assigned = ((now - job.accepted_at).days) if job.accepted_at else 999 %}
+          {% if days_assigned <= 5 %}
+            <form method="POST" action="{{ url_for('remove_job', job_id=job.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-red"
+                      onclick="return confirm('Remove this assigned job within 5-day window?')">Remove</button>
+            </form>
+          {% else %}
+            <button onclick="toggleCancel({{ job.id }})" class="btn btn-sm btn-red">Request Cancel</button>
+          {% endif %}
+
+        {% elif job.status == 'pending_cancel' %}
+          {# Check if cancel request was initiated by worker — customer needs to respond #}
+          {% set cr = job.cancel_requests | selectattr('status','equalto','pending') | selectattr('initiated_by','equalto','worker') | first %}
+          {% if cr %}
+            <div class="chip" style="background:#FEF2F2;color:#B91C1C;font-weight:600;">⚠ Worker requested cancellation</div>
+            <a href="{{ url_for('respond_cancel', cr_id=cr.id, action='accept') }}"
+               class="btn btn-sm btn-green"
+               onclick="return confirm('Accept cancellation and free the worker?')">Accept Cancel</a>
+            <a href="{{ url_for('respond_cancel', cr_id=cr.id, action='reject') }}"
+               class="btn btn-sm btn-red"
+               onclick="return confirm('Reject the cancellation — job will continue.')">Reject</a>
+          {% else %}
+            <span class="chip" style="background:#FFFBEB;color:#92400E;">Awaiting worker response</span>
+          {% endif %}
+
+        {% elif job.status == 'completed' and job.assigned_worker_id %}
+          {% if job.payment_sent and not job.payment_accepted %}
+            <span class="chip" style="background:#FFFBEB;color:#92400E;">💳 Payment sent — awaiting worker</span>
+          {% elif job.payment_accepted %}
+            {# Check if review already given #}
+            {% set already_reviewed = namespace(v=false) %}
+            {% for r in current_user.reviews_given %}
+              {% if r.job_id == job.id %}{% set already_reviewed.v = true %}{% endif %}
+            {% endfor %}
+            <span class="chip" style="background:#F0FDF4;color:#166534;">
+              ₹{{ "%.0f"|format(job.payment_amount) }} paid ✓
+            </span>
+            {% if not already_reviewed.v %}
+              <button onclick="toggleReview({{ job.id }})" class="btn btn-sm">Leave Review</button>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    {% if job.status == 'assigned' and job.assigned_worker %}
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);">
+      Assigned to: <strong style="color:var(--text);">{{ job.assigned_worker.name }}</strong>
+      {% if job.assigned_worker.phone %} · {{ job.assigned_worker.phone }}{% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Cancel request form (customer-initiated, for after 5-day window) -->
+    <div id="cancel-form-{{ job.id }}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <form method="POST" action="{{ url_for('request_cancel', job_id=job.id) }}">
+        <div style="display:flex;gap:8px;align-items:flex-end;">
+          <div class="field" style="margin:0;flex:1;">
+            <label>Reason for cancellation</label>
+            <input type="text" name="reason" placeholder="Briefly explain why you want to cancel..." required />
+          </div>
+          <button type="submit" class="btn btn-sm btn-red" style="margin-bottom:1px;"
+                  onclick="return confirm('Send cancellation request to worker?')">Send Request</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Review form -->
+    {% set already_reviewed = namespace(v=false) %}
+    {% for r in current_user.reviews_given %}
+      {% if r.job_id == job.id %}{% set already_reviewed.v = true %}{% endif %}
+    {% endfor %}
+    {% if job.status == 'completed' and job.payment_accepted and not already_reviewed.v %}
+    <div id="review-{{ job.id }}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+      <form method="POST" action="{{ url_for('submit_review', job_id=job.id) }}">
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+          <div class="field" style="margin:0;flex:0 0 140px;">
+            <label>Rating</label>
+            <select name="rating">
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+              <option value="2">★★☆☆☆ (2)</option>
+              <option value="1">★☆☆☆☆ (1)</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0;flex:1;">
+            <label>Comment</label>
+            <input type="text" name="comment" placeholder="How was the work?" />
+          </div>
+          <button type="submit" class="btn btn-green btn-sm" style="margin-bottom:1px;">Submit Review</button>
+        </div>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📋</div>
+    <div class="empty-title">No jobs yet</div>
+    <div class="empty-sub">Post your first job to start receiving applications</div>
+    <a href="{{ url_for('post_job') }}" class="btn btn-green" style="margin-top:14px;">Post a Job</a>
+  </div>
+{% endif %}
+
+{% endblock %}

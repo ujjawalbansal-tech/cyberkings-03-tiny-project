@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">My Profile</div>
+    <div class="page-sub">Your account details and hiring history</div>
+  </div>
+</div>
+
+<div class="profile-grid">
+  <!-- Left card -->
+  <div>
+    <div class="profile-card">
+      <div class="profile-av-lg" id="av-wrapper">
+        {% if current_user.profile_photo %}
+          <img id="av-preview" src="{{ url_for('uploaded_file', filename=current_user.profile_photo) }}" alt="Photo">
+        {% else %}
+          <span class="initials-text">{{ current_user.get_initials() }}</span>
+          <img id="av-preview" src="" alt="" style="display:none;">
+        {% endif %}
+        <label class="profile-av-upload" for="photo-input">📷 Change</label>
+      </div>
+
+      <div class="profile-name">{{ current_user.name }}</div>
+      <div class="profile-role">Customer · {{ current_user.city or 'No city set' }}</div>
+
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+        Member since {{ current_user.created_at.strftime('%b %Y') }}
+      </div>
+      <span class="sbadge s-accepted">Customer Account</span>
+    </div>
+
+    <!-- Stats mini card -->
+    <div class="info-card" style="margin-top:14px;">
+      <div class="info-title">Job Summary</div>
+      <div class="info-row"><span class="info-key">Total Posted</span><span class="info-val">{{ stats.total }}</span></div>
+      <div class="info-row"><span class="info-key">Open</span><span class="info-val">{{ stats.open }}</span></div>
+      <div class="info-row"><span class="info-key">Assigned</span><span class="info-val">{{ stats.assigned }}</span></div>
+      <div class="info-row"><span class="info-key">Completed</span><span class="info-val">{{ stats.completed }}</span></div>
+    </div>
+  </div>
+
+  <!-- Right side -->
+  <div>
+    <!-- Edit form -->
+    <div class="info-card">
+      <div class="info-title">Edit Profile</div>
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file" id="photo-input" name="profile_photo" accept="image/*" style="display:none"
+               onchange="previewPhoto(this,'av-preview')">
+        <div class="field-grid">
+          <div class="field">
+            <label>Full name</label>
+            <input type="text" name="name" value="{{ current_user.name }}" required />
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input type="tel" name="phone" value="{{ current_user.phone or '' }}" placeholder="+91 XXXXX XXXXX" />
+          </div>
+          <div class="field">
+            <label>City / Area</label>
+            <input type="text" name="city" value="{{ current_user.city or '' }}" placeholder="Mathura, Agra..." />
+          </div>
+        </div>
+        <button type="submit" class="btn-full-green">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- All jobs history -->
+    <div class="info-card">
+      <div class="info-title">All Jobs Posted</div>
+      {% if all_jobs %}
+        {% for job in all_jobs %}
+        <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:14px;font-weight:600;color:var(--text);">{{ job.title }}</span>
+            <span class="sbadge s-{{ job.status }}">{{ job.status }}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);display:flex;gap:8px;flex-wrap:wrap;">
+            <span>{{ job.skill }}</span>
+            <span>{{ job.location }}</span>
+            {% if job.budget %}<span>{{ job.budget }}/day</span>{% endif %}
+            <span>{{ job.created_at.strftime('%d %b %Y') }}</span>
+          </div>
+          {% if job.status == 'assigned' and job.assigned_worker %}
+            <div style="font-size:12px;color:var(--primary);margin-top:4px;">
+              Worker: <strong>{{ job.assigned_worker.name }}</strong>
+              {% if job.assigned_worker.phone %} · {{ job.assigned_worker.phone }}{% endif %}
+            </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No jobs posted yet.</div>
+      {% endif %}
+    </div>
+
+    <!-- Reviews given -->
+    {% if reviews_given %}
+    <div class="info-card">
+      <div class="info-title">Reviews You've Given</div>
+      {% for r in reviews_given %}
+      <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span class="stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text);">{{ r.rating }}/5</span>
+          <span style="font-size:12px;color:var(--text-muted);">{{ r.created_at.strftime('%d %b %Y') }}</span>
+        </div>
+        {% if r.comment %}
+          <div style="font-size:13px;color:var(--text-muted);font-style:italic;">"{{ r.comment }}"</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

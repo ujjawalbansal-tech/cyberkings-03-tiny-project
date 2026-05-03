@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}My Requests — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">Direct Requests</div>
+    <div class="page-sub">Job requests sent to you by customers — accept or decline</div>
+  </div>
+</div>
+
+{% if requests_list %}
+  {% for app in requests_list %}
+  <div class="job-item">
+    <div class="job-top">
+      <div>
+        <div class="job-title">{{ app.job.title }}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
+          From: <strong style="color:var(--text);">{{ app.job.customer.name }}</strong>
+          {% if app.job.customer.phone %} · {{ app.job.customer.phone }}{% endif %}
+        </div>
+      </div>
+      <span class="sbadge s-{{ app.status }}">
+        {% if app.status == 'pending' %}⏳ Awaiting your response
+        {% elif app.status == 'worker_accepted' %}✓ Accepted
+        {% elif app.status == 'rejected' %}✗ Declined
+        {% else %}{{ app.status }}{% endif %}
+      </span>
+    </div>
+
+    {% if app.job.description %}
+      <div class="job-desc">{{ app.job.description }}</div>
+    {% endif %}
+
+    <div class="job-foot">
+      {% if app.job.skill     %}<span class="chip">{{ app.job.skill }}</span>{% endif %}
+      {% if app.job.location  %}<span class="chip">📍 {{ app.job.location }}</span>{% endif %}
+      {% if app.job.budget    %}<span class="chip">₹{{ app.job.budget }}/day</span>{% endif %}
+      {% if app.job.date_from %}
+        <span class="chip">📅 {{ app.job.date_from }}{% if app.job.date_to %} → {{ app.job.date_to }}{% endif %}</span>
+      {% endif %}
+      <span class="chip">Received {{ app.created_at.strftime('%d %b, %I:%M %p') }}</span>
+    </div>
+
+    {% if app.status == 'pending' %}
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <a href="{{ url_for('accept_direct_request', app_id=app.id) }}"
+         class="btn btn-green btn-sm"
+         onclick="return confirm('Accept this job request from {{ app.job.customer.name }}?')">
+        ✓ Accept Request
+      </a>
+      <a href="{{ url_for('reject_direct_request', app_id=app.id) }}"
+         class="btn btn-sm btn-red"
+         onclick="return confirm('Decline this request?')">
+        ✗ Decline
+      </a>
+    </div>
+    {% endif %}
+
+    {% if app.status == 'worker_accepted' %}
+    <div class="alert alert-success" style="margin-top:10px;">
+      ✓ You accepted this job. The customer has been notified and the job is now assigned to you.
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📨</div>
+    <div class="empty-title">No direct requests yet</div>
+    <div class="empty-sub">When customers send you a direct job request, it will appear here.</div>
+  </div>
+{% endif %}
+
+{% endblock %}

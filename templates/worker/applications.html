@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}My Applications — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">My Applications</div>
+    <div class="page-sub">Track all jobs you've applied for</div>
+  </div>
+</div>
+
+<!-- Customer-initiated cancel requests needing worker response -->
+{% if cancel_reqs %}
+<div class="alert alert-warning" style="margin-bottom:16px;">
+  <strong>⚠ Cancellation Requests:</strong> {{ cancel_reqs|length }} customer(s) have requested to cancel an active job. See below.
+</div>
+{% endif %}
+
+{% if applications %}
+  {% for app in applications %}
+  {% if not app.job.is_direct_request %}
+  <div class="job-item">
+    <div class="job-top">
+      <div class="job-title">{{ app.job.title }}</div>
+      <span class="sbadge s-{{ app.status }}">{{ app.status }}</span>
+    </div>
+
+    <div class="job-foot" style="margin-top:6px;">
+      <span class="chip">{{ app.job.skill }}</span>
+      <span class="chip">{{ app.job.location }}</span>
+      {% if app.job.budget %}<span class="chip">₹{{ app.job.budget }}/day</span>{% endif %}
+      {% if app.job.date_from %}
+        <span class="chip">📅 {{ app.job.date_from }}{% if app.job.date_to %} → {{ app.job.date_to }}{% endif %}</span>
+      {% endif %}
+      <span class="chip">Applied {{ app.created_at.strftime('%d %b %Y') }}</span>
+
+      {% if app.status == 'accepted' %}
+        <div class="chip-ml" style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:var(--primary-dark);font-weight:500;">
+            ✓ Hired by {{ app.job.customer.name }}
+          </span>
+          {% if app.job.customer.phone %}
+            <span class="chip">📞 {{ app.job.customer.phone }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if app.message %}
+      <div style="font-size:13px;color:var(--text-muted);margin-top:8px;font-style:italic;">
+        Your message: "{{ app.message }}"
+      </div>
+    {% endif %}
+
+    <!-- Payment notification -->
+    {% if app.status == 'accepted' and app.job.payment_sent and not app.job.payment_accepted %}
+    <div class="alert alert-info" style="margin-top:10px;">
+      💰 Customer has sent a payment of <strong>₹{{ "%.0f"|format(app.job.payment_amount) }}</strong>.
+      <a href="{{ url_for('accept_payment', job_id=app.job.id) }}"
+         class="btn btn-sm btn-green" style="margin-left:10px;"
+         onclick="return confirm('Accept ₹{{ "%.0f"|format(app.job.payment_amount) }} payment?')">
+        Accept Payment
+      </a>
+    </div>
+    {% endif %}
+
+    {% if app.status == 'accepted' and app.job.payment_accepted %}
+    <div class="alert alert-success" style="margin-top:10px;">
+      ✓ Payment of <strong>₹{{ "%.0f"|format(app.job.payment_amount) }}</strong> received!
+    </div>
+    {% endif %}
+
+    <!-- Worker-initiated cancel option (only for accepted, assigned jobs) -->
+    {% if app.status == 'accepted' and app.job.status == 'assigned' %}
+    <div style="margin-top:10px;">
+      <button onclick="toggleCancel({{ app.job.id }})" class="btn btn-sm btn-red">Request Job Cancellation</button>
+    </div>
+    <div id="cancel-form-{{ app.job.id }}" style="display:none;margin-top:10px;padding:12px;background:var(--bg);border-radius:var(--r-md);">
+      <form method="POST" action="{{ url_for('request_cancel', job_id=app.job.id) }}">
+        <div class="field" style="margin-bottom:8px;">
+          <label>Why do you want to cancel?</label>
+          <textarea name="reason" rows="2" placeholder="Describe your reason for cancellation..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-sm btn-red"
+                onclick="return confirm('Send cancellation request to customer?')">
+          Send Cancellation Request
+        </button>
+      </form>
+    </div>
+    {% endif %}
+
+    <!-- Respond to customer-initiated cancel -->
+    {% set my_cancel = cancel_reqs | selectattr('job_id','equalto',app.job.id) | first | default(none) %}
+    {% if my_cancel %}
+    <div class="alert alert-warning" style="margin-top:10px;">
+      ⚠ Customer wants to cancel this job.
+      {% if my_cancel.reason %}<em>"{{ my_cancel.reason }}"</em>{% endif %}
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <a href="{{ url_for('respond_cancel', cr_id=my_cancel.id, action='accept') }}"
+           class="btn btn-sm btn-green"
+           onclick="return confirm('Accept cancellation?')">Accept</a>
+        <a href="{{ url_for('respond_cancel', cr_id=my_cancel.id, action='reject') }}"
+           class="btn btn-sm"
+           onclick="return confirm('Reject — job continues.')">Reject</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% endfor %}
+
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <div class="empty-title">No applications yet</div>
+    <div class="empty-sub">Browse open jobs and apply to get started</div>
+    <a href="{{ url_for('browse_jobs') }}" class="btn btn-green" style="margin-top:14px;">Browse Jobs</a>
+  </div>
+{% endif %}
+
+{% endblock %}

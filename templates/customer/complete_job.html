@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Complete Job — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">Mark Job Complete</div>
+    <div class="page-sub">Enter the payment amount to send to the worker</div>
+  </div>
+  <a href="{{ url_for('my_jobs') }}" class="btn btn-sm">← Back</a>
+</div>
+
+<div class="form-card">
+  <div style="margin-bottom:20px;padding:16px;background:var(--primary-lite);border-radius:var(--r-md);">
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">{{ job.title }}</div>
+    <div style="font-size:13px;color:var(--text-muted);">
+      Worker: <strong>{{ job.assigned_worker.name if job.assigned_worker else 'Unknown' }}</strong>
+      {% if job.date_from %} · {{ job.date_from }}{% if job.date_to %} → {{ job.date_to }}{% endif %}{% endif %}
+    </div>
+  </div>
+
+  <form method="POST">
+    <div class="field">
+      <label>Total Payment Amount (₹)</label>
+      <input type="number" name="payment_amount" placeholder="e.g. 2400" min="0" step="1" required />
+      {% if job.budget %}
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+          Budget was ₹{{ job.budget }}/day
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="alert alert-info">
+      💡 After you submit, the worker will receive a payment notification and must accept it. Once accepted, you can leave a review.
+    </div>
+
+    <button type="submit" class="btn-full-green"
+            onclick="return confirm('Send payment of ₹ to worker and mark job complete?')">
+      Mark Complete & Send Payment
+    </button>
+  </form>
+</div>
+
+{% endblock %}

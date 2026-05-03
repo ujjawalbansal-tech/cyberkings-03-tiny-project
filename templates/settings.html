@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Settings — ZARIYA{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <div class="page-title">Settings</div>
+    <div class="page-sub">Manage your account, appearance and security</div>
+  </div>
+</div>
+
+<div class="settings-grid">
+  <!-- Sidebar nav -->
+  <div class="settings-nav">
+    <a href="#security" class="active">🔐 Security</a>
+    <a href="#appearance">🎨 Appearance</a>
+  </div>
+
+  <div>
+    <!-- Security -->
+    <div class="settings-section" id="security">
+      <div class="settings-title">Change Password</div>
+      <form method="POST" style="max-width:420px;">
+        <input type="hidden" name="action" value="change_password">
+        <div class="field">
+          <label>Current Password</label>
+          <input type="password" name="old_password" placeholder="Enter current password" required />
+        </div>
+        <div class="field">
+          <label>New Password</label>
+          <input type="password" name="new_password" id="np1" placeholder="Min. 6 characters" required minlength="6" />
+        </div>
+        <div class="field">
+          <label>Confirm New Password</label>
+          <input type="password" id="np2" placeholder="Re-enter new password" required />
+        </div>
+        <p id="np-err" style="color:var(--red);font-size:13px;display:none;margin-bottom:8px;">Passwords do not match.</p>
+        <button type="submit" class="btn btn-primary" onclick="return checkNewPass()">Update Password</button>
+      </form>
+    </div>
+
+    <!-- Appearance -->
+    <div class="settings-section" id="appearance">
+      <div class="settings-title">Appearance</div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h4>Dark Mode</h4>
+          <p>Switch to a dark background for comfortable viewing</p>
+        </div>
+        <div class="toggle-switch" id="dark-toggle" onclick="toggleDark()"></div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:12px;">Theme Color</div>
+        <div class="theme-swatches">
+          <div class="swatch swatch-teal"   data-color="teal"   title="Teal"   onclick="selectSwatch('teal')"></div>
+          <div class="swatch swatch-blue"   data-color="blue"   title="Blue"   onclick="selectSwatch('blue')"></div>
+          <div class="swatch swatch-purple" data-color="purple" title="Purple" onclick="selectSwatch('purple')"></div>
+          <div class="swatch swatch-amber"  data-color="amber"  title="Amber"  onclick="selectSwatch('amber')"></div>
+          <div class="swatch swatch-rose"   data-color="rose"   title="Rose"   onclick="selectSwatch('rose')"></div>
+        </div>
+      </div>
+
+      <!-- Hidden form to save theme server-side (optional persistence) -->
+      <form method="POST" style="margin-top:18px;">
+        <input type="hidden" name="action" value="theme">
+        <input type="hidden" name="theme_color" id="theme_color_input" value="{{ current_user.theme_color }}">
+        <input type="checkbox" name="dark_mode" id="dark_mode_input" style="display:none" {{ 'checked' if current_user.dark_mode }}>
+        <button type="submit" class="btn btn-sm btn-primary">Save Theme Preference</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function checkNewPass() {
+  const p1  = document.getElementById('np1');
+  const p2  = document.getElementById('np2');
+  const err = document.getElementById('np-err');
+  if (p1.value !== p2.value) { err.style.display='block'; return false; }
+  err.style.display = 'none';
+  return true;
+}
+</script>
+{% endblock %}
